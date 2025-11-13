@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Security System</title>
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --secondary-color: #ff9800;
+            --secondary-dark: #f57c00;
+            --background-color: #e8f5e9;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: opacity 0.5s ease;
+        }
+
+        body.fade-out {
+            opacity: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+            max-width: 700px;
+            margin: 0 auto 20px;
+            line-height: 1.5;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary-light);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            margin: 5px;
+            width: calc(100% - 10px);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #f44336;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d32f2f;
+        }
+
+        .btn-exit {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-exit:hover {
+            background-color: var(--secondary-dark);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .range-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .range-btn {
+            padding: 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .range-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .range-btn.selected {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .scrollable-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .car-entry {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .car-number {
+            width: 80px;
+            font-weight: bold;
+        }
+
+        .car-input {
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        .tab-container {
+            margin-top: 20px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            background-color: #f5f5f5;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-button.active {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .car-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        .car-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .car-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .car-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+        }
+
+        .export-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .export-btn {
+            flex: 1;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .export-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .export-btn.selected {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .exit-message {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin: 20px auto;
+            max-width: 500px;
+            display: none;
+        }
+
+        .exit-message h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .exit-message p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .range-buttons {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+            
+            .export-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="mainContainer">
+        <header>
+            <h1>Car Security System</h1>
+            <p class="description">
+                This project is designed to enhance the attendance of cars coming into the church and out. 
+                It includes features such as car detection, license plate recognition, and logging of entry and exit times.
+            </p>
+        </header>
+
+        <div class="card">
+            <button id="startBtn" class="btn">Start Security System</button>
+            <button id="settingsBtn" class="btn">Settings</button>
+            <button id="viewDataBtn" class="btn">View Car Data</button>
+            <button id="exitCarBtn" class="btn btn-exit">Exit Car</button>
+            <button id="saveDataBtn" class="btn">Save Data to File</button>
+            <button id="exitBtn" class="btn btn-secondary">Exit Application</button>
+        </div>
+    </div>
+
+    <!-- Exit Message -->
+    <div class="exit-message" id="exitMessage">
+        <h2>Application Closed</h2>
+        <p>The Church Car Security System has been closed.</p>
+        <p>You can safely close this browser tab now.</p>
+        <button id="reopenBtn" class="btn" style="margin-top: 20px;">Reopen Application</button>
+    </div>
+
+    <!-- Date Selection Modal -->
+    <div id="dateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Select Date</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="dateInput">Enter the date (YYYY-MM-DD):</label>
+                <input type="date" id="dateInput">
+            </div>
+            <button id="confirmDateBtn" class="btn">Confirm</button>
+        </div>
+    </div>
+
+    <!-- Range Selection Modal -->
+    <div id="rangeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Select Car Range</h2>
+                <span class="close">&times;</span>
+            </div>
+            <p>Select expected number of cars:</p>
+            <div class="range-buttons" id="rangeButtons">
+                <!-- Range buttons will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- License Plate Input Modal -->
+    <div id="licenseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="licenseModalTitle">Input License Plates</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="scrollable-container" id="licenseInputs">
+                <!-- License plate inputs will be generated here -->
+            </div>
+            <button id="saveLicenseBtn" class="btn">Save All</button>
+        </div>
+    </div>
+
+    <!-- Summary Modal -->
+    <div id="summaryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="summaryModalTitle">Data Summary</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="scrollable-container" id="summaryContent">
+                <!-- Summary content will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- View Data Modal -->
+    <div id="viewDataModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">All Car Data</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="tab-container">
+                <div class="tab-buttons" id="dataTabs">
+                    <!-- Tab buttons will be generated here -->
+                </div>
+                <div class="tab-content-container" id="tabContentContainer">
+                    <!-- Tab content will be generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exit Car Modal -->
+    <div id="exitCarModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Exit Car</h2>
+                <span class="close">&times;</span>
+            </div>
+            <p>Select a car to exit:</p>
+            <div class="car-list" id="exitCarList">
+                <!-- Car list will be generated here -->
+            </div>
+            <button id="confirmExitBtn" class="btn btn-exit">Mark as Exited</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Settings</h2>
+                <span class="close">&times;</span>
+            </div>
+            <p>Settings feature would go here</p>
+        </div>
+    </div>
+
+    <!-- Save Data Modal -->
+    <div id="saveDataModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Save Data to File</h2>
+                <span class="close">&times;</span>
+            </div>
+            <p>Select file format:</p>
+            <div class="export-options">
+                <div class="export-btn selected" data-format="json">JSON Format</div>
+                <div class="export-btn" data-format="txt">Text Format</div>
+            </div>
+            <div class="form-group">
+                <label for="fileName">File Name (without extension):</label>
+                <input type="text" id="fileName" placeholder="car_data">
+            </div>
+            <button id="confirmSaveBtn" class="btn">Save File</button>
+        </div>
+    </div>
+
+    <!-- Exit Confirmation Modal -->
+    <div id="exitConfirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Exit Application</h2>
+                <span class="close">&times;</span>
+            </div>
+            <p>Are you sure you want to exit the Church Car Security System?</p>
+            <p><strong>Any unsaved data will be lost.</strong></p>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="confirmExitAppBtn" class="btn btn-secondary" style="flex: 1;">Yes, Exit</button>
+                <button id="cancelExitBtn" class="btn" style="flex: 1;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application state
+        const appState = {
+            carData: {},
+            currentRange: "",
+            selectedDate: new Date().toISOString().split('T')[0],
+            ranges: [
+                "1-40", "1-50", "1-60", "1-70", "1-80", "1-90", 
+                "1-100", "1-110", "1-120", "1-130", "1-140", 
+                "1-150", "1-160", "1-170", "1-180", "1-190", "1-200"
+            ],
+            selectedFormat: "json"
+        };
+
+        // DOM Elements
+        const modals = {
+            date: document.getElementById('dateModal'),
+            range: document.getElementById('rangeModal'),
+            license: document.getElementById('licenseModal'),
+            summary: document.getElementById('summaryModal'),
+            viewData: document.getElementById('viewDataModal'),
+            exitCar: document.getElementById('exitCarModal'),
+            settings: document.getElementById('settingsModal'),
+            saveData: document.getElementById('saveDataModal'),
+            exitConfirm: document.getElementById('exitConfirmModal')
+        };
+
+        const buttons = {
+            start: document.getElementById('startBtn'),
+            settings: document.getElementById('settingsBtn'),
+            viewData: document.getElementById('viewDataBtn'),
+            exitCar: document.getElementById('exitCarBtn'),
+            saveData: document.getElementById('saveDataBtn'),
+            exit: document.getElementById('exitBtn'),
+            confirmDate: document.getElementById('confirmDateBtn'),
+            saveLicense: document.getElementById('saveLicenseBtn'),
+            confirmExit: document.getElementById('confirmExitBtn'),
+            confirmSave: document.getElementById('confirmSaveBtn'),
+            confirmExitApp: document.getElementById('confirmExitAppBtn'),
+            cancelExit: document.getElementById('cancelExitBtn'),
+            reopen: document.getElementById('reopenBtn')
+        };
+
+        const mainContainer = document.getElementById('mainContainer');
+        const exitMessage = document.getElementById('exitMessage');
+
+        // Initialize the application
+        function init() {
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Initialize date input with today's date
+            document.getElementById('dateInput').value = appState.selectedDate;
+            
+            // Generate range buttons
+            generateRangeButtons();
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Main buttons
+            buttons.start.addEventListener('click', startSecuritySystem);
+            buttons.settings.addEventListener('click', () => openModal(modals.settings));
+            buttons.viewData.addEventListener('click', viewCarData);
+            buttons.exitCar.addEventListener('click', exitCar);
+            buttons.saveData.addEventListener('click', () => openModal(modals.saveData));
+            buttons.exit.addEventListener('click', () => openModal(modals.exitConfirm));
+            buttons.reopen.addEventListener('click', reopenApplication);
+
+            // Modal buttons
+            buttons.confirmDate.addEventListener('click', confirmDate);
+            buttons.saveLicense.addEventListener('click', saveLicenseData);
+            buttons.confirmExit.addEventListener('click', processExit);
+            buttons.confirmSave.addEventListener('click', saveToFile);
+            buttons.confirmExitApp.addEventListener('click', exitApplication);
+            buttons.cancelExit.addEventListener('click', () => modals.exitConfirm.style.display = 'none');
+
+            // Export format selection
+            document.querySelectorAll('.export-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.export-btn').forEach(b => {
+                        b.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    appState.selectedFormat = this.dataset.format;
+                });
+            });
+
+            // Close modals when clicking on X
+            document.querySelectorAll('.close').forEach(closeBtn => {
+                closeBtn.addEventListener('click', () => {
+                    Object.values(modals).forEach(modal => {
+                        modal.style.display = 'none';
+                    });
+                });
+            });
+
+            // Close modals when clicking outside
+            window.addEventListener('click', (event) => {
+                Object.values(modals).forEach(modal => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Generate range buttons
+        function generateRangeButtons() {
+            const rangeButtonsContainer = document.getElementById('rangeButtons');
+            rangeButtonsContainer.innerHTML = '';
+            
+            appState.ranges.forEach(range => {
+                const button = document.createElement('div');
+                button.className = 'range-btn';
+                button.textContent = range;
+                button.addEventListener('click', () => inputLicensePlates(range));
+                rangeButtonsContainer.appendChild(button);
+            });
+        }
+
+        // Start security system
+        function startSecuritySystem() {
+            alert('Security system starting...');
+            openModal(modals.date);
+        }
+
+        // Confirm date selection
+        function confirmDate() {
+            const dateInput = document.getElementById('dateInput').value;
+            
+            if (!dateInput) {
+                alert('Please select a date.');
+                return;
+            }
+            
+            appState.selectedDate = dateInput;
+            modals.date.style.display = 'none';
+            openModal(modals.range);
+        }
+
+        // Input license plates
+        function inputLicensePlates(carRange) {
+            appState.currentRange = carRange;
+            
+            if (!appState.carData[carRange]) {
+                appState.carData[carRange] = {};
+            }
+            
+            // Get the range boundaries
+            const [minCars, maxCars] = carRange.split('-').map(Number);
+            
+            // Update modal title
+            document.getElementById('licenseModalTitle').textContent = 
+                `Input License Plates - ${carRange} cars for ${appState.selectedDate}`;
+            
+            // Generate input fields
+            const licenseInputsContainer = document.getElementById('licenseInputs');
+            licenseInputsContainer.innerHTML = '';
+            
+            for (let i = minCars; i <= maxCars; i++) {
+                const carEntry = document.createElement('div');
+                carEntry.className = 'car-entry';
+                
+                const carNumber = document.createElement('div');
+                carNumber.className = 'car-number';
+                carNumber.textContent = `Car ${i}:`;
+                
+                const carInput = document.createElement('input');
+                carInput.type = 'text';
+                carInput.className = 'car-input';
+                carInput.placeholder = 'License plate';
+                
+                carEntry.appendChild(carNumber);
+                carEntry.appendChild(carInput);
+                licenseInputsContainer.appendChild(carEntry);
+            }
+            
+            modals.range.style.display = 'none';
+            openModal(modals.license);
+        }
+
+        // Save license data
+        function saveLicenseData() {
+            const carRange = appState.currentRange;
+            const [minCars, maxCars] = carRange.split('-').map(Number);
+            const inputs = document.querySelectorAll('#licenseInputs .car-input');
+            
+            inputs.forEach((input, index) => {
+                const carNum = minCars + index;
+                const plate = input.value.trim();
+                
+                if (plate) {
+                    appState.carData[carRange][`car_${carNum}`] = {
+                        plate: plate,
+                        entryTime: new Date().toLocaleString(),
+                        exitTime: null
+                    };
+                }
+            });
+            
+            alert(`License plates for ${carRange} cars on ${appState.selectedDate} saved!`);
+            modals.license.style.display = 'none';
+            showSummary();
+        }
+
+        // Show summary
+        function showSummary() {
+            const carRange = appState.currentRange;
+            const data = appState.carData[carRange] || {};
+            
+            document.getElementById('summaryModalTitle').textContent = 
+                `Data Summary for ${carRange} cars on ${appState.selectedDate}`;
+            
+            const summaryContent = document.getElementById('summaryContent');
+            summaryContent.innerHTML = '';
+            
+            if (Object.keys(data).length === 0) {
+                summaryContent.innerHTML = '<p class="no-data">No data available.</p>';
+            } else {
+                for (const [carId, info] of Object.entries(data)) {
+                    const summaryItem = document.createElement('div');
+                    summaryItem.className = 'summary-item';
+                    summaryItem.innerHTML = `
+                        <strong>${carId}:</strong> ${info.plate} - Entry: ${info.entryTime}
+                    `;
+                    summaryContent.appendChild(summaryItem);
+                }
+            }
+            
+            openModal(modals.summary);
+        }
+
+        // View car data
+        function viewCarData() {
+            if (Object.keys(appState.carData).length === 0) {
+                alert('No car data available yet.');
+                return;
+            }
+            
+            const tabButtonsContainer = document.getElementById('dataTabs');
+            const tabContentContainer = document.getElementById('tabContentContainer');
+            
+            tabButtonsContainer.innerHTML = '';
+            tabContentContainer.innerHTML = '';
+            
+            Object.keys(appState.carData).forEach((range, index) => {
+                // Create tab button
+                const tabButton = document.createElement('button');
+                tabButton.className = `tab-button ${index === 0 ? 'active' : ''}`;
+                tabButton.textContent = range;
+                tabButton.addEventListener('click', () => switchTab(range));
+                tabButtonsContainer.appendChild(tabButton);
+                
+                // Create tab content
+                const tabContent = document.createElement('div');
+                tabContent.className = `tab-content ${index === 0 ? 'active' : ''}`;
+                tabContent.id = `tab-${range}`;
+                
+                const data = appState.carData[range];
+                let contentHTML = '';
+                
+                for (const [carId, info] of Object.entries(data)) {
+                    contentHTML += `
+                        <div class="summary-item">
+                            <strong>${carId}:</strong> ${info.plate}<br>
+                            <small>Entry: ${info.entryTime}</small><br>
+                            <small>Exit: ${info.exitTime || 'Not recorded'}</small>
+                        </div>
+                    `;
+                }
+                
+                if (contentHTML === '') {
+                    contentHTML = '<p class="no-data">No data available for this range.</p>';
+                }
+                
+                tabContent.innerHTML = contentHTML;
+                tabContentContainer.appendChild(tabContent);
+            });
+            
+            openModal(modals.viewData);
+        }
+
+        // Switch between tabs
+        function switchTab(range) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`tab-${range}`).classList.add('active');
+        }
+
+        // Exit car
+        function exitCar() {
+            if (Object.keys(appState.carData).length === 0) {
+                alert('No car data available yet.');
+                return;
+            }
+            
+            const exitCarList = document.getElementById('exitCarList');
+            exitCarList.innerHTML = '';
+            
+            // Get all available cars that haven't exited yet
+            const availableCars = [];
+            
+            for (const [rangeStr, cars] of Object.entries(appState.carData)) {
+                for (const [carId, carInfo] of Object.entries(cars)) {
+                    if (!carInfo.exitTime) {
+                        availableCars.push({ rangeStr, carId, carInfo });
+                    }
+                }
+            }
+            
+            if (availableCars.length === 0) {
+                exitCarList.innerHTML = '<p class="no-data">No cars currently in the system.</p>';
+            } else {
+                availableCars.forEach(car => {
+                    const carItem = document.createElement('div');
+                    carItem.className = 'car-item';
+                    carItem.textContent = 
+                        `${car.rangeStr} - ${car.carId}: ${car.carInfo.plate} (Entered: ${car.carInfo.entryTime})`;
+                    carItem.dataset.range = car.rangeStr;
+                    carItem.dataset.carId = car.carId;
+                    carItem.addEventListener('click', function() {
+                        // Toggle selection
+                        document.querySelectorAll('.car-item').forEach(item => {
+                            item.classList.remove('selected');
+                        });
+                        this.classList.add('selected');
+                    });
+                    exitCarList.appendChild(carItem);
+                });
+            }
+            
+            openModal(modals.exitCar);
+        }
+
+        // Process exit
+        function processExit() {
+            const selectedCar = document.querySelector('.car-item.selected');
+            
+            if (!selectedCar) {
+                alert('Please select a car to exit.');
+                return;
+            }
+            
+            const rangeStr = selectedCar.dataset.range;
+            const carId = selectedCar.dataset.carId;
+            const carInfo = appState.carData[rangeStr][carId];
+            
+            // Record exit time
+            appState.carData[rangeStr][carId].exitTime = new Date().toLocaleString();
+            
+            // Option to completely remove from system
+            const removeFromSystem = confirm(
+                `Car ${carId} (${carInfo.plate}) has been marked as exited.\n\n` +
+                'Do you want to completely remove this car from the system?'
+            );
+            
+            if (removeFromSystem) {
+                delete appState.carData[rangeStr][carId];
+                alert(`Car ${carId} has been completely removed from the system.`);
+            } else {
+                alert(`Car ${carId} has been marked as exited.`);
+            }
+            
+            modals.exitCar.style.display = 'none';
+        }
+
+        // Save to file
+        function saveToFile() {
+            if (Object.keys(appState.carData).length === 0) {
+                alert('No data to save.');
+                return;
+            }
+            
+            const fileNameInput = document.getElementById('fileName');
+            let fileName = fileNameInput.value.trim();
+            
+            if (!fileName) {
+                fileName = `car_data_${new Date().toISOString().split('T')[0]}`;
+            }
+            
+            let dataStr, mimeType, fileExtension;
+            
+            if (appState.selectedFormat === "json") {
+                dataStr = JSON.stringify(appState.carData, null, 2);
+                mimeType = 'application/json';
+                fileExtension = 'json';
+            } else {
+                // Format data as readable text
+                dataStr = formatDataAsText(appState.carData);
+                mimeType = 'text/plain';
+                fileExtension = 'txt';
+            }
+            
+            const dataBlob = new Blob([dataStr], { type: mimeType });
+            
+            // Create a download link
+            const downloadLink = document.createElement('a');
+            downloadLink.download = `${fileName}.${fileExtension}`;
+            downloadLink.href = URL.createObjectURL(dataBlob);
+            downloadLink.click();
+            
+            alert(`Data saved as ${fileExtension.toUpperCase()} file successfully!`);
+            modals.saveData.style.display = 'none';
+        }
+
+        // Format data as readable text
+        function formatDataAsText(carData) {
+            let text = "CHURCH CAR SECURITY SYSTEM DATA\n";
+            text += "===============================\n\n";
+            
+            for (const [range, cars] of Object.entries(carData)) {
+                text += `CAR RANGE: ${range}\n`;
+                text += "=".repeat(50) + "\n\n";
+                
+                for (const [carId, info] of Object.entries(cars)) {
+                    text += `${carId}:\n`;
+                    text += `  License Plate: ${info.plate}\n`;
+                    text += `  Entry Time: ${info.entryTime}\n`;
+                    text += `  Exit Time: ${info.exitTime || 'Not recorded'}\n\n`;
+                }
+                
+                text += "\n";
+            }
+            
+            return text;
+        }
+
+        // Exit the application
+        function exitApplication() {
+            // Close all modals
+            Object.values(modals).forEach(modal => {
+                modal.style.display = 'none';
+            });
+            
+            // Add fade-out effect
+            document.body.classList.add('fade-out');
+            
+            // Hide main content and show exit message
+            setTimeout(() => {
+                mainContainer.style.display = 'none';
+                exitMessage.style.display = 'block';
+                document.body.classList.remove('fade-out');
+            }, 500);
+        }
+
+        // Reopen the application
+        function reopenApplication() {
+            exitMessage.style.display = 'none';
+            mainContainer.style.display = 'block';
+        }
+
+        // Open modal
+        function openModal(modal) {
+            Object.values(modals).forEach(m => {
+                m.style.display = 'none';
+            });
+            modal.style.display = 'block';
+        }
+
+        // Initialize the application when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
